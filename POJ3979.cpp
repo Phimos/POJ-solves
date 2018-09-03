@@ -2,7 +2,8 @@
 #include<algorithm>
 #include<string>
 using namespace std;
-
+//my_gcd为求最大公因数
+//注意可能运算完后为整数
 int my_gcd(int a, int b)
 {
 	while (a % b)
