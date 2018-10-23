@@ -14,9 +14,12 @@ struct Line
 	Line() {}
 	bool operator<(const Line& b)const
 	{
-		return order < b.order;
+		if (order != b.order)
+			return order < b.order;
+		else
+			return start > b.start;//重合边的时候，入边在前，出边在后！！！！
 	}
-} xlines[5010], ylines[5010];
+} xlines[10010], ylines[10010];
 
 
 struct Node
