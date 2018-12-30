@@ -1,18 +1,15 @@
 #include<iostream>
 #include<algorithm>
 #include<string>
+#include<cstring>
+#include<cstdio>
 #include<queue>
 #include<map>
 using namespace std;
-//AC自动机
 #define maxn 1010
-#define INF 0x7fffffff
+#define INF 0xfffffff
 map<char, int> DNAset;
-DNAset['A'] = 0;
-DNAset['G'] = 1;
-DNAset['C'] = 2;
-DNAset['T'] = 3;
-
+//AC自动机
 int nodeCnt = 2;
 string str;
 int dp[maxn][maxn];
@@ -29,7 +26,7 @@ void insert(string& s)
 	Node* root = tree + 1;
 	for (int i = 0; i < s.length(); ++i)
 	{
-		int k = DNASet[s[i]];
+		int k = DNAset[s[i]];
 		if (root->children[k] == NULL)
 		{
 			root->children[k] = tree + nodeCnt;
@@ -47,11 +44,6 @@ void buildDfa()
 		tree[0].children[i] = tree + 1;
 	}
 	tree[1].fail = tree;
-	for (int i = 0; i < 4; ++i)
-	{
-		if (!tree[1]->children[i])
-			tree[1].children[i] = tree + 1;
-	}
 	queue<Node*> qNodes;
 	qNodes.push(tree + 1);
 	while (!qNodes.empty())
@@ -71,29 +63,40 @@ void buildDfa()
 			}
 			else
 			{
-				temp->children[i] = temp->fail->children[i];
+				if (temp == tree + 1)
+					temp->children[i] = tree + 1;
+				else
+					temp->children[i] = temp->fail->children[i];
 			}
 		}
 	}
 }
 
-
-
 int main()
 {
+	DNAset['A'] = 0;
+	DNAset['G'] = 1;
+	DNAset['C'] = 2;
+	DNAset['T'] = 3;
 	int n;
+	int caseCnt = 0;
 	string tempString;
 	while (cin >> n, n)
 	{
+		++caseCnt;
+		nodeCnt = 2;
+		memset(tree, 0, sizeof(tree));
 		for (int i = 0; i < n; ++i)
 		{
 			cin >> tempString;
 			insert(tempString);
 		}
 		buildDfa();
-		cin >> s;
-		int slen = s.length();
-		memeset(dp, INF, sizeof(dp));
+		cin >> str;
+		int slen = str.length();
+		for (int i = 0; i <= slen; ++i)
+			for (int j = 1; j < nodeCnt; ++j)
+				dp[i][j] = INF;
 		dp[0][1] = 0;
 		for (int i = 0; i < slen; ++i)
 		{
@@ -104,7 +107,8 @@ int main()
 					for (int k = 0; k < 4; ++k)
 					{
 						int idx = tree[j].children[k] - tree;
-						dp[i + 1][idx] = min(dp[i + 1][idx], dp[i][j] + DNAset[str[i - 1]] != k);
+						if (tree[idx].virus == false)
+							dp[i + 1][idx] = min(dp[i + 1][idx], dp[i][j] + (DNAset[str[i]] != k));
 					}
 				}
 			}
@@ -114,6 +118,8 @@ int main()
 		{
 			ans = min(ans, dp[slen][i]);
 		}
-		printf("%d\n", ans);
+		if (ans == INF)
+			ans = -1;
+		printf("Case %d: %d\n", caseCnt, ans);
 	}
 }
